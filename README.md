@@ -1,74 +1,76 @@
-# YieldArch-AI: Meta-Cognitive Yield Optimization for Semiconductor Fabrication
+# SiteScanner-AI: Autonomous Retail Location Intelligence Engine
 
-> **How I built a Meta-Cognitive Agent that Dynamically Adjusts Reasoning Depth for Real-Time Semiconductor Yield Analysis.**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/release/python-3120/)
 
-![Title Animation](https://raw.githubusercontent.com/aniket-work/YieldArch-AI/main/images/title-animation.gif)
+## How I Automated Retail Expansion Strategy with Geospatial AI and Spatial Clustering
 
-## 🎯 Overview
+![SiteScanner-AI Animation](https://raw.githubusercontent.com/aniket-work/SiteScanner-AI/main/images/title-animation.gif)
 
-**YieldArch-AI** is an experimental PoC (Proof of Concept) designed to solve a critical business problem in high-precision manufacturing: **Semiconductor Yield Optimization**. 
+SiteScanner-AI is an experimental PoC designed to solve the complex business problem of retail site selection. By synthesizing urban demographic layers, foot traffic simulations, and competitor proximity data, this engine identifies the "hottest" underserved spots for franchise expansion.
 
-Standard AI agents often operate with fixed reasoning patterns—either too shallow for complex chemical-plasma imbalances or too expensive for simple thermal drifts. **YieldArch-AI** implements a **Meta-Cognitive Router** using **LangGraph** to dynamically scale reasoning depth (Shallow, Moderate, or Deep) based on real-time telemetry from fabrication stations.
+> **Note:** This is an experimental project and part of my personal research into autonomous geospatial agents.
 
-### Key Features
-1. **Dynamic Reasoning Scaling**: Automatically switches between heuristic fixes and deep multi-modal root cause analysis.
-2. **LangGraph Orchestration**: State-managed agentic workflow for predictable yet flexible decision-making.
-3. **Semiconductor Simulation**: Built-in environment simulating Lithography, Etching, and Deposition sensor streams.
-4. **Visual Analytics**: Automated technical reporting with ASCII tables and cognitive path visualization.
+---
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
-![Architecture](https://raw.githubusercontent.com/aniket-work/YieldArch-AI/main/images/architecture_diagram.png)
+![Architecture](https://raw.githubusercontent.com/aniket-work/SiteScanner-AI/main/images/architecture-diagram.png)
 
-The system follows a three-tier cognitive model:
-- **Level 1 (Shallow):** Resolves operational drifts (e.g., simple heat exchanger recalibration).
-- **Level 2 (Moderate):** Analyzes statistical drifts and temporal pressure instabilities.
-- **Level 3 (Deep):** Performs deep multi-modal RCA for synergistic failures (e.g., Gas-Plasma imbalance).
+The system is built on a modular three-tier architecture:
+1.  **Data Layer**: Generates high-fidelity synthetic urban environments with demographic and competitive features.
+2.  **Compute Layer**: A weighted ROI optimizer that ranks sites based on customized business drivers.
+3.  **Visualization Layer**: An interactive Folium-based engine that renders decision-grade geospatial reports.
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Python 3.10+
-- OpenAI API Key (Set as `OPENAI_API_KEY`)
+## 🚀 Quick Start
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/aniket-work/YieldArch-AI.git
-   cd YieldArch-AI
-   ```
-
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Mac/Linux
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Running the Agent
-
-To run a simulation and trigger the meta-cognitive analysis:
+### 1. Clone the repository
 ```bash
-python main.py
+git clone https://github.com/aniket-work/SiteScanner-AI.git
+cd SiteScanner-AI
 ```
 
-## 📊 Visual Assets
+### 2. Setup Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-### Sequence Flow
-![Sequence](https://raw.githubusercontent.com/aniket-work/YieldArch-AI/main/images/sequence_diagram.png)
+### 3. Run Analysis
+```bash
+python3 main.py
+```
 
-### Logic Flow
-![Flow](https://raw.githubusercontent.com/aniket-work/YieldArch-AI/main/images/flow_diagram.png)
+---
 
-## 🧪 Experiments & Insights
+## 📊 Logic Flow
 
-I observed that in my opinion, the ability for an agent to "know when to think harder" reduces token costs by approximately 60% in high-volume manufacturing environments while maintaining 99%+ accuracy for critical failure detection. This experimental PoC demonstrates that meta-cognition is the key to scaling agentic workflows in industrial settings.
+![Workflow](https://raw.githubusercontent.com/aniket-work/SiteScanner-AI/main/images/flow-diagram.png)
 
-## 📄 Disclaimer
+The engine follows a rigorous pipeline:
+- **Synthetic Synthesis**: Creating a digital twin of urban activity.
+- **Competitor Cannibalization Audit**: Calculating penalty scores for proximity to existing brands.
+- **ROI Scoring**: Applying weighted importance to foot traffic vs. household income.
+- **Spatial Clustering**: Using K-Means to identify target investment corridors.
 
-The views and opinions expressed here are solely my own and do not represent the views, positions, or opinions of my employer or any organization I am affiliated with. The content is based on my personal experience and experimentation and may be incomplete or incorrect. Any errors or misinterpretations are unintentional, and I apologize in advance if any statements are misunderstood or misrepresented.
+---
+
+## 🛠️ Tech Stack
+- **Language**: Python 3.12
+- **Geospatial**: Folium, Branca
+- **Analysis**: Pandas, NumPy, Scikit-learn
+- **Viz Assets**: PIL (Pillow), Mermaid.js
+
+---
+
+## 📄 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 🙋‍♂️ Author
+**Aniket** - [GitHub](https://github.com/aniket-work)
+**Experimental PoC Article**: [Read the full story on Dev.to](https://dev.to/aniketwork/location-intelligence-building-an-autonomous-site-selection-engine-with-geospatial-ai-1m8k)

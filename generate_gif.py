@@ -1,153 +1,142 @@
 import os
 from PIL import Image, ImageDraw, ImageFont
-import time
+import json
 
-# --- CONFIGURATION ---
+# Configuration
 WIDTH, HEIGHT = 900, 550
-BG_COLOR = (30, 30, 30)
+BG_COLOR = (20, 20, 25)
+TERM_COLOR = (30, 30, 35)
 TEXT_COLOR = (240, 240, 240)
-BAR_COLOR = (50, 50, 50)
-ACCENT_GREEN = (0, 255, 65)  # Matrix/Terminal Green
-ACCENT_RED = (255, 95, 87)
-ACCENT_YELLOW = (255, 189, 46)
-ACCENT_BLUE = (0, 122, 255)
+HEADER_COLOR = (60, 60, 70)
+GREEN = (80, 250, 123)
+BLUE = (139, 233, 253)
+YELLOW = (241, 250, 140)
+RED = (255, 85, 85)
 
-# --- MOCK TERMINAL LOGS ---
-COMMANDS = ["$ python main.py --station Etching-04", "... initializing LangGraph workflow", "... meta-cognitive router active", "... complexity HIGH detected", "... triggering Level 3 Deep RCA", "--- YieldArch Report ---"]
-REPORT = [
-    "+----------------+--------------------------------+",
-    "|   PARAMETER    |            VALUE               |",
-    "+----------------+--------------------------------+",
-    "| Reasoning      | Deep Meta-Cognition (Level 3)  |",
-    "| Root Cause     | Chem-Plasma Synergic Defect    |",
-    "| Yield Impact   | -4.2% (Prevented)              |",
-    "| Recommendation | Halt Line & Inspect Manifold   |",
-    "+----------------+--------------------------------+"
-]
-
-def draw_window_frame(draw):
-    """Draws Mac-style terminal frame."""
-    draw.rectangle([0, 0, WIDTH, 35], fill=BAR_COLOR)
-    # Traffic lights
-    draw.ellipse([12, 12, 22, 22], fill=ACCENT_RED)
-    draw.ellipse([28, 12, 38, 22], fill=ACCENT_YELLOW)
-    draw.ellipse([44, 12, 54, 22], fill=ACCENT_GREEN)
-    draw.text((WIDTH//2 - 50, 10), "YieldArch-AI Terminal", fill=(180,180,180))
-
-def create_frames():
-    frames = []
-    # Try to load a monospaced font
+def create_terminal_frame(commands, lines, cursor_pos=None, show_table=False):
+    """Creates a frame mimicking a Mac-style terminal."""
+    img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
+    draw = ImageDraw.Draw(img)
+    
+    # Terminal Window
+    term_x, term_y = 50, 50
+    term_w, term_h = WIDTH - 100, HEIGHT - 100
+    draw.rounded_rectangle([term_x, term_y, term_x + term_w, term_y + term_h], radius=10, fill=TERM_COLOR)
+    
+    # Header Bar
+    draw.rounded_rectangle([term_x, term_y, term_x + term_w, term_y + 30], radius=10, fill=HEADER_COLOR)
+    # Buttons
+    for i, color in enumerate([RED, YELLOW, GREEN]):
+        draw.ellipse([term_x + 10 + (i * 20), term_y + 8, term_x + 22 + (i * 20), term_y + 20], fill=color)
+    
+    # Font
     try:
-        font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Courier New.ttf", 16)
-        bold_font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Courier New Bold.ttf", 20)
+        font = ImageFont.truetype("/System/Library/Fonts/Monaco.ttf", 16)
+        bold_font = ImageFont.truetype("/System/Library/Fonts/Monaco.ttf", 18)
     except:
         font = ImageFont.load_default()
         bold_font = ImageFont.load_default()
 
-    # --- PART 1: TERMINAL TYPING ---
+    # Content
+    y_offset = term_y + 45
+    for line in lines:
+        draw.text((term_x + 20, y_offset), line, font=font, fill=TEXT_COLOR)
+        y_offset += 25
+    
+    if cursor_pos:
+        draw.rectangle([cursor_pos[0], cursor_pos[1], cursor_pos[0] + 10, cursor_pos[1] + 20], fill=TEXT_COLOR)
+
+    if show_table:
+        table_lines = [
+            "+----------+-------+------------+---------+",
+            "| SITE_ID  | SCORE | INCOME     | TRAFFIC |",
+            "+----------+-------+------------+---------+",
+            "| SITE_020 | 79.55 | $94,690    | 4465    |",
+            "| SITE_017 | 78.74 | $104,022   | 3707    |",
+            "| SITE_039 | 77.47 | $112,373   | 3997    |",
+            "+----------+-------+------------+---------+"
+        ]
+        for line in table_lines:
+            draw.text((term_x + 20, y_offset), line, font=font, fill=YELLOW)
+            y_offset += 22
+
+    return img
+
+def create_ui_frame(title, stats):
+    """Creates a premium UI frame showing analysis results."""
+    img = Image.new("RGB", (WIDTH, HEIGHT), (30, 32, 40))
+    draw = ImageDraw.Draw(img)
+    
+    # Simple UI Cards
+    draw.text((50, 50), title, fill=BLUE, font_size=32)
+    
+    card_x = 50
+    card_y = 120
+    for key, val in stats.items():
+        draw.rounded_rectangle([card_x, card_y, card_x + 350, card_y + 80], radius=12, fill=(45, 48, 60))
+        draw.text((card_x + 20, card_y + 15), key.replace('_', ' ').title(), fill=TEXT_COLOR, font_size=18)
+        draw.text((card_x + 20, card_y + 40), str(val), fill=GREEN, font_size=24)
+        card_y += 100
+        if card_y > 400:
+            card_x += 400
+            card_y = 120
+            
+    return img
+
+def generate_gif():
+    frames = []
+    
+    # 1. Terminal Part: Typing commands
+    cmd = "$ python main.py"
     current_lines = []
-    
-    # Typing command
-    cmd = COMMANDS[0]
     for i in range(len(cmd) + 1):
-        img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
-        draw = ImageDraw.Draw(img)
-        draw_window_frame(draw)
-        
-        y_offset = 60
-        # Draw typed command
-        draw.text((20, y_offset), cmd[:i] + ("|" if i < len(cmd) else ""), font=font, fill=ACCENT_GREEN)
-        frames.append(img)
-
-    # Scrolling logs
-    for log in COMMANDS[1:]:
-        current_lines.append(log)
-        for _ in range(3): # Hold per log
-            img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
-            draw = ImageDraw.Draw(img)
-            draw_window_frame(draw)
-            y_offset = 60
-            draw.text((20, y_offset), COMMANDS[0], font=font, fill=ACCENT_GREEN)
-            y_offset += 30
-            for line in current_lines:
-                draw.text((20, y_offset), line, font=font, fill=TEXT_COLOR)
-                y_offset += 25
-            frames.append(img)
-
-    # --- PART 2: ASCII TABLE ---
-    for i in range(len(REPORT) + 1):
-        img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
-        draw = ImageDraw.Draw(img)
-        draw_window_frame(draw)
-        y_offset = 60
-        draw.text((20, y_offset), COMMANDS[0], font=font, fill=ACCENT_GREEN)
-        y_offset += 30
-        for line in current_lines:
-            draw.text((20, y_offset), line, font=font, fill=TEXT_COLOR)
-            y_offset += 25
-        
-        y_offset += 10
-        for line in REPORT[:i]:
-            draw.text((20, y_offset), line, font=font, fill=ACCENT_GREEN)
-            y_offset += 20
-        frames.append(img)
-
-    # Hold terminal for a bit
-    for _ in range(15):
-        frames.append(frames[-1])
-
-    # --- PART 3: TRANSITION TO UI ---
-    # Create UI Frame
-    ui_img = Image.new("RGB", (WIDTH, HEIGHT), (245, 245, 250)) # Light premium bg
-    draw_ui = ImageDraw.Draw(ui_img)
-    draw_ui.rectangle([0, 0, WIDTH, 60], fill=ACCENT_BLUE)
-    draw_ui.text((20, 15), "YieldArch Dashboard Analytics", fill=(255, 255, 255), font=bold_font)
+        lines = [cmd[:i]]
+        frames.append(create_terminal_frame(cmd, lines, cursor_pos=(50 + 20 + len(cmd[:i])*10, 50 + 45)))
     
-    # Draw Data Cards
-    draw_ui.rectangle([50, 100, 300, 250], fill=(255, 255, 255), outline=(200, 200, 200))
-    draw_ui.text((70, 120), "Current Yield", fill=(100, 100, 100), font=font)
-    draw_ui.text((70, 150), "98.2%", fill=ACCENT_GREEN, font=bold_font)
+    # 2. Execution Logs
+    logs = [
+        "--- [SiteScanner-AI] Starting Analysis ---",
+        "[1/5] Synthesizing urban geospatial layers...",
+        "[2/5] Running spatial optimization models...",
+        "[3/5] Identifying strategic corridors...",
+        "[4/5] Generating interactive visualization...",
+        "[5/5] Analysis complete! Map saved."
+    ]
+    for i in range(len(logs) + 1):
+        display_lines = [cmd] + logs[:i]
+        for _ in range(2): # Hold slightly
+            frames.append(create_terminal_frame(cmd, display_lines))
     
-    draw_ui.rectangle([350, 100, 600, 250], fill=(255, 255, 255), outline=(200, 200, 200))
-    draw_ui.text((370, 120), "Agent Status", fill=(100, 100, 100), font=font)
-    draw_ui.text((370, 150), "Deep Mode", fill=ACCENT_BLUE, font=bold_font)
+    # 3. Final Table
+    frames.append(create_terminal_frame(cmd, display_lines + ["", "Top Recommendations:"], show_table=True))
+    for _ in range(15): # Hold terminal table
+        frames.append(create_terminal_frame(cmd, display_lines + ["", "Top Recommendations:"], show_table=True))
 
-    draw_ui.rectangle([650, 100, 850, 250], fill=(255, 255, 255), outline=(200, 200, 200))
-    draw_ui.text((670, 120), "Anomalies", fill=(100, 100, 100), font=font)
-    draw_ui.text((670, 150), "1 Critical", fill=ACCENT_RED, font=bold_font)
+    # 4. Transition to UI
+    stats = {
+        "Total Sites Analyzed": 40,
+        "Optimal Locations Found": 5,
+        "Avg Reliability Score": "76.4%",
+        "Target City": "San Francisco",
+        "Competitor Proximity": "Safe"
+    }
+    ui_frame = create_ui_frame("SiteScanner-AI Dashboard", stats)
+    for _ in range(25): # Hold UI
+        frames.append(ui_frame)
 
-    # Hold UI
-    for _ in range(20):
-        frames.append(ui_img)
-
-    return frames
-
-def save_optimized_gif(frames, output="images/title-animation.gif"):
-    os.makedirs("images", exist_ok=True)
-    
-    # Generate global palette from sample frames (start, middle, end)
+    # MANDATORY: Savig with Global Palette and P-Mode
+    print("Optimizing GIF with global palette...")
     sample = Image.new("RGB", (WIDTH, HEIGHT * 3))
-    sample.paste(frames[0], (0, 0))
+    sample.paste(frames[0], (0,0))
     sample.paste(frames[len(frames)//2], (0, HEIGHT))
-    sample.paste(frames[-1], (0, HEIGHT * 2))
-    
-    # Quantize to 256 colors
+    sample.paste(frames[-1], (0, HEIGHT*2))
     palette = sample.quantize(colors=256, method=2)
     
-    # Convert all frames to P-mode using global palette (No Dither)
     final_frames = [f.quantize(palette=palette, dither=Image.Dither.NONE) for f in frames]
-    
-    # Save optimized GIF
-    final_frames[0].save(
-        output,
-        save_all=True,
-        append_images=final_frames[1:],
-        optimize=True,
-        loop=0,
-        duration=100
-    )
-    print(f"Successfully saved {output}")
+    os.makedirs("images", exist_ok=True)
+    OUTPUT = "images/title-animation.gif"
+    final_frames[0].save(OUTPUT, save_all=True, append_images=final_frames[1:], optimize=True, loop=0, duration=100)
+    print(f"✅ Saved {OUTPUT}")
 
 if __name__ == "__main__":
-    frames = create_frames()
-    save_optimized_gif(frames)
+    generate_gif()
